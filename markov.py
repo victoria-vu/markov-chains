@@ -1,7 +1,6 @@
 """Generate Markov text from text files."""
 
 from random import choice
-# choice()
 
 def open_and_read_file(file_path):
     """Take file path as string; return text as string.
@@ -9,11 +8,8 @@ def open_and_read_file(file_path):
     Takes a string that is a file path, opens the file, and turns
     the file's contents as one string of text.
     """
-    # open the file using "file_path"
-    # return string as text using open("filename").read()
     
-    file = open(file_path).read().split() #can add .read and .split together -
-    #this read the entire file per item
+    file = open(file_path).read().split() # Can add .read() and .split() together 
     return file
 
 
@@ -43,27 +39,15 @@ def make_chains(text_string):
         #nothing follows juanita
     """
     
-    #can loop over list 2 words at a time by index instead of item with range
-        # for i in range (len(text) - 1): 
-            # print text [i], text[i + 1] 
-        #create tuple of keys (word1, word2) using the for loop
-    #create list of values that follow those two words (word1, word2)
-    #chain = tuple(key) and list(values)
-        # exclude the last bigram as key in chains dictionary
-    # .keys ? sorted(_.keys())?
-    # 
-    #return dict of chains
-    #
     chains = {}
 
-    for i in range(len(text_string) - 2): #gets rid of last items
-        green_eggs = (text_string[i], text_string[i + 1]) #made into tuple - set to this variable 
-        if green_eggs in chains: # Appending the value to an existing key 
-            chains[green_eggs].append(text_string[i+2])
-        else: # Creating a new key 
-            chains[green_eggs] = [text_string[i+2]] #tuple became key (green_eggs), value set to word after tuple
-        #dict[key] = [string[value]] means key and value
-        #had an error because - 2 had to match +2 so that it didnt loop farther than the list
+    for i in range(len(text_string) - 2): 
+        key = (text_string[i], text_string[i + 1]) 
+        if key in chains: # Appending the value (word) to an existing key (bigram)
+            chains[key].append(text_string[i+2])
+        else: # Creating a new key if it does not exist in dictionary
+            chains[key] = [text_string[i+2]] # Bigram is added to dictionary, the value is the word following the bigram
+        # Had an IndexError because - 2 had to match +2 so that it didn't loop farther than the list
     
     print(chains)
     return chains
@@ -74,43 +58,32 @@ def make_chains(text_string):
 def make_text(chains):
     """Return text from chains."""
 
-    words = [] # container
+    words = []
 
-    # create a link (link is a key from our dictionary and a random word from the list of words that follow it)
-        # you can use random's choice function (choice()) to pick a random key from chains.keys()
-        # current_key
-    # put the words from that link in a container
-        #chosen_word ?
-    # make a new key out of the second word in the first key and the random word you pulled out from the list of words that followed it
-        #new_key
+    # Get a list of all of the keys in the dictionary
+    key_list = chains.keys() 
+    key_list = list(key_list)
 
-    key_list = chains.keys() #took all keys out
-    key_list = list(key_list) #made into a list
+    # Create a starting link (first three words) with a random key and random word from a list of words that follow it
+    starting_link = choice(key_list)
+    for item in starting_link:
+        words.append(item)
+    words.append(choice(chains[starting_link]))
 
-    #link = key + random word from list of words that follow 
-    for chosen_word in words:
-        words[chosen_word] = choice(key_list), # chosen_word is a random key from the key list
-        words[chosen_random_word] = choice(chains[chosen_word]) # a random word from list of words that follow that key
-        
-    
-    # word = [(Would, you, could)]
-    # random_key = choice(key_list) 
-    # random_key.add(choice(chains[random_key]))
-     
-
+    # Make a new key out of the second word in the first key and the random word you pulled out from a list of words that follow it
+    # Keep on creating sentences until it ends with "Sam I am?"
+    while True:
+        new_link = (words[-2], words[-1])
+        if new_link in key_list:
+            words.append(choice(chains[new_link]))
+        else:
+            break
 
     print(words)
     return ' '.join(words)
 
-# myTuple = ("John", "Peter", "Vicky")
-# x = "#".join(myTuple)
-# print(x)
-# John#Peter#Vicky
-
-
-
-
-input_path = 'green-eggs.txt'
+# input_path = 'green-eggs.txt'
+input_path = 'gettysburg.txt'
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
